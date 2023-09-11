@@ -174,7 +174,7 @@ public class OutputFrameController {
         // Invalid when a button with an X or an O is clicked.
         if (!this.buttons[i][j].getText().equals(""))
             new Alert(Alert.AlertType.ERROR, "Invalid coordinates: Try again!").showAndWait();
-        // Button must be blank.
+            // Button must be blank.
         else {
             if (this.playerXTurn) {
                 // Changed background color to green to indicate next player's turn.
@@ -258,23 +258,29 @@ public class OutputFrameController {
         // Search for adjacency for X's and O's or vice versa, and replace them.
         // Update scores for X's and O's accordingly.
         for (int x = startRow; x <= endRow; x++) {
-            for (int y = startColumn; y <= endColumn; y++) {
-                if (this.playerXTurn) {
-                    if (this.buttons[x][y].getText().equals("O")) {
-                        this.buttons[x][y].setText("X");
-                        this.playerXScore++;
-                        this.playerOScore--;
-                    }
-                } else if (this.buttons[x][y].getText().equals("X")) {
-                    this.buttons[x][y].setText("O");
-                    this.playerOScore++;
-                    this.playerXScore--;
-                }
-            }
+            this.setPlayerScore(x, j);
+        }
+
+        for (int y = startColumn; y <= endColumn; y++) {
+            this.setPlayerScore(i, y);
         }
 
         this.playerXScoreLabel.setText(String.valueOf(this.playerXScore));
         this.playerOScoreLabel.setText(String.valueOf(this.playerOScore));
+    }
+
+    private void setPlayerScore(int i, int j){
+        if (this.playerXTurn) {
+            if (this.buttons[i][j].getText().equals("O")) {
+                this.buttons[i][j].setText("X");
+                this.playerXScore++;
+                this.playerOScore--;
+            }
+        } else if (this.buttons[i][j].getText().equals("X")) {
+            this.buttons[i][j].setText("O");
+            this.playerOScore++;
+            this.playerXScore--;
+        }
     }
 
 
@@ -347,7 +353,8 @@ public class OutputFrameController {
     }
 
     private void moveBot() {
-        int[] botMove = this.bot.move();
+        // Get bot's move. Pass the current game board and the number of rounds left.
+        int[] botMove = this.bot.move(this.buttons, this.roundsLeft);
         int i = botMove[0];
         int j = botMove[1];
 
