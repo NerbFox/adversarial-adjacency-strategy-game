@@ -10,21 +10,9 @@ public class Bot {
         List<Integer> boardValues = new ArrayList<Integer>();
         // initialize empty spaces on board
         List<int[]> emptySpaces = getEmptySpaces(board);
-        // one round is player move and bot move
-        // if bot is first, then the depth of the game will 2 * rl
-        // if bot is second, then the depth of the game will 2 * rl - 1
+        // initialize depth of game
+        int depth_game = depthGame(rl, isBotFirst, emptySpaces.size());
 
-        // initialize depth of game,
-        int depth_game = 0;
-        if (isBotFirst) {
-            depth_game = 2 * rl;
-        } else {
-            depth_game = 2 * rl - 1;
-        }
-        // if the size of empty spaces < depth of game, then the depth of the game will be the size of empty spaces
-        if (emptySpaces.size() < depth_game) {
-            depth_game = emptySpaces.size();
-        }
 
 
 
@@ -61,6 +49,28 @@ public class Bot {
         }
         return emptySpaces;
     }
+
+    // return dept of the game
+    private int depthGame(int rl, boolean isBotFirst, int sizeEmptySpaces) {
+        // one round is player move and bot move
+        // if bot is first, then the depth of the game will 2 * rl
+        // if bot is second, then the depth of the game will 2 * rl - 1
+        int depth_game = 0;
+        if (isBotFirst) {
+            depth_game = 2 * rl;
+        } else {
+            depth_game = 2 * rl - 1;
+        }
+        // if the size of empty spaces < depth of game, then the depth of the game will be the size of empty spaces
+        if (sizeEmptySpaces < depth_game) {
+            depth_game = sizeEmptySpaces;
+        }
+        return depth_game;
+    }
+
+    // move function
+
+
 
     // objective function for board state
     // the objective function is the sum of the values of each row, column, and diagonal where X is +1 and O is -1
@@ -113,19 +123,8 @@ public class Bot {
     }
 
 
-    // check if game is finished (gak efektif)
-//    private boolean isFinished(String[][] board, int rl) {
-//        if (rl == 0) {
-//            return true;
-//        }
-//        if (getEmptySpaces(board).size() == 0) {
-//            return true;
-//        }
-//        return false;
-//    }
-
     // minimax algorithm
     // minFunction is the opponent's move
     // maxFunction is the bot's move
-//    private
+
 }
