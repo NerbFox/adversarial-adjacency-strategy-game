@@ -76,54 +76,20 @@ public class Bot {
     // the objective function is the sum of the values of each row, column, and diagonal where X is +1 and O is -1
     private int boardValue(String[][] board) {
         int value = 0;
-        // check rows
         for (int i = 0; i < board.length; i++) {
-            int rowValue = 0;
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j].equals("X")) {
-                    rowValue++;
-                } else if (board[i][j].equals("O")) {
-                    rowValue--;
+                if (board[i][j].equals("O")) {
+                    value++;
+                } else if (board[i][j].equals("X")) {
+                    value--;
                 }
             }
-            value += rowValue;
         }
-        // check columns
-        for (int i = 0; i < board.length; i++) {
-            int colValue = 0;
-            for (int j = 0; j < board[i].length; j++) {
-                if (board[j][i].equals("X")) {
-                    colValue++;
-                } else if (board[j][i].equals("O")) {
-                    colValue--;
-                }
-            }
-            value += colValue;
-        }
-        // check diagonals
-        int diagValue = 0;
-        for (int i = 0; i < board.length; i++) {
-            if (board[i][i].equals("X")) {
-                diagValue++;
-            } else if (board[i][i].equals("O")) {
-                diagValue--;
-            }
-        }
-        value += diagValue;
-        diagValue = 0;
-        for (int i = 0; i < board.length; i++) {
-            if (board[i][board.length-1-i].equals("X")) {
-                diagValue++;
-            } else if (board[i][board.length-1-i].equals("O")) {
-                diagValue--;
-            }
-        }
-        value += diagValue;
         return value;
     }
 
 
-    // minimax algorithm
+    // minimax algorithm with alpha-beta pruning
     // minFunction is the opponent's move
     // maxFunction is the bot's move
 
