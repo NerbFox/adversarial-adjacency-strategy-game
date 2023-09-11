@@ -353,8 +353,8 @@ public class OutputFrameController {
     }
 
     private void moveBot() {
-        // Get bot's move. Pass the current game board and the number of rounds left.
-        int[] botMove = this.bot.move(this.buttons, this.roundsLeft);
+        // Get bot's move. Pass the current game board, the number of rounds left, and the first turn.
+        int[] botMove = this.bot.move(this.buttons, this.roundsLeft, this.isBotFirst);
         int i = botMove[0];
         int j = botMove[1];
 
