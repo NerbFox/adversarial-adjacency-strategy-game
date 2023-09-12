@@ -2,6 +2,7 @@ import javafx.scene.control.Button;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
+import java.lang.Math;
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
@@ -14,25 +15,30 @@ public class Bot {
         List<Integer> boardValues = new ArrayList<Integer>();
         // initialize empty spaces on board
         List<int[]> emptySpaces = getEmptySpaces(board);
-        // initialize depth of game
+        // initialize depth of game (terminal depth)
         int depth_game = depthGame(rl, isBotFirst, emptySpaces.size());
         // initialize board value
         int boardValue = boardValue(board);
         System.out.println("board value a: " + boardValue);
+        // print depth of game
+        System.out.println("max depth: " + depth_game);
 
-
-
+        int[] res = this.minimaxDecision(board, emptySpaces, depth_game, boardValue);
+        int x = res[0];
+        int y = res[1];
+        System.out.println("x" + x);
+        System.out.println("y" + y);
 
         // create random move from empty spaces
-        int randomMove = (int) (Math.random()*emptySpaces.size());
-        int x = emptySpaces.get(randomMove)[0];
-        int y = emptySpaces.get(randomMove)[1];
-        System.out.println("before");
-        printBoard(board);
-        Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue, x, y);
-        System.out.println("board value: " + p.getValue());
-        System.out.println("after");
-        printBoard(p.getKey());
+//        int randomMove = (int) (Math.random()*emptySpaces.size());
+//        x = emptySpaces.get(randomMove)[0];
+//        y = emptySpaces.get(randomMove)[1];
+//        System.out.println("before");
+//        printBoard(board);
+//        Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue, x, y);
+//        System.out.println("board value: " + p.getValue());
+//        System.out.println("after");
+//        printBoard(p.getKey());
         return new int[]{x, y};
         // return new int[]{(int) (Math.random()*8), (int) (Math.random()*8)};
     }
@@ -176,9 +182,185 @@ public class Bot {
         return value;
     }
 
+    private int[] minimaxDecision2(String[][] board, List<int[]> emptySpaces, int depth, int alpha, int beta, boolean isMaximizing) {
+        if (depth == 0) {
+            int boardValue = boardValue(board);
+            return new int[]{boardValue, -1, -1};
+        }
+
+        int bestValue;
+        int bestX = -1;
+        int bestY = -1;
+
+        if (isMaximizing) {
+            bestValue = Integer.MIN_VALUE;
+            for (int[] space : emptySpaces) {
+//                System.out.println("length: " + emptySpaces.size());
+                int i = space[0];
+                int j = space[1];
+                Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue(board), i, j);
+                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
+                newEmptySpaces.remove(0);
+                int[] res = minimaxDecision2(p.getKey(), newEmptySpaces, depth - 1, alpha, beta, false);
+                int v = res[0];
+
+                if (v > bestValue) {
+                    bestValue = v;
+                    if (depth == 3) {
+                        System.out.println("bestValue: " + bestValue);
+                        System.out.println("i: " + i + " j: " + j);
+                    }
+                    bestX = i;
+                    bestY = j;
+                }
+
+                alpha = Math.max(alpha, bestValue);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+        } else {
+            bestValue = Integer.MAX_VALUE;
+            for (int[] space : emptySpaces) {
+                int i = space[0];
+                int j = space[1];
+                Pair<String[][], Integer> p = updateGameBoard(board, player, boardValue(board), i, j);
+                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
+                newEmptySpaces.remove(0);
+                int[] res = minimaxDecision2(p.getKey(), newEmptySpaces, depth - 1, alpha, beta, true);
+                int v = res[0];
+
+                if (v < bestValue) {
+                    bestValue = v;
+//                    bestX = i;
+//                    bestY = j;
+                }
+
+                beta = Math.min(beta, bestValue);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+        }
+
+        return new int[]{bestValue, bestX, bestY};
+    }
+
+
 
     // minimax algorithm with alpha-beta pruning
     // minFunction is the opponent's move
     // maxFunction is the bot's move
+    private int[] minimaxDecision(String[][] board, List<int[]> emptySpace, int depth, int boardValue) {
+        int alpha = Integer.MIN_VALUE; // -infinity
+        int beta = Integer.MAX_VALUE; // +infinity
+        System.out.println("alpha: " + alpha + " beta: " + beta);
+        int[] res = this.minimaxDecision2(board, emptySpace, depth, alpha, beta, true);
+        System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
+        return new int[]{res[1], res[2]};
+//        int[] res = this.maxFunction(board, emptySpace, depth, bot, boardValue, alpha, beta);
+//        System.out.println("finish minmax with res: " + res[0] + " alpha: " + res[1] + " beta: " + res[2] + " x: " + res[3] + " y: " + res[4]);
+//        return new int[]{res[3], res[4]};
+    }
 
+    // maxFunction is the bot's move, return the board value, alpha, and beta
+    private int[] maxFunction(String[][] board, List<int[]> emptySpace, int depth, String player, int boardValue, int alpha, int beta) {
+        System.out.println("mx depth: " + depth);
+//        System.out.println("max empty space: ");
+//        for (int[] space : emptySpace) {
+//            System.out.print("[" + space[0] + ", " + space[1] + "] ");
+//        }
+//        System.out.println();
+        if (depth == 0 ) {
+            System.out.println("max depth == 0");
+            return new int[]{boardValue, alpha, beta, -1, -1};
+        }
+
+        // maxFunction is the bot's move
+        int bestValue = Integer.MIN_VALUE;
+        int bestMoveX = 0;
+        int bestMoveY = 0;
+        for (int[] space : emptySpace) {
+//            print len of empty space
+            System.out.println("max empty space len 1: " + emptySpace.size());
+            int i = space[0];
+            int j = space[1];
+            Pair<String[][], Integer> p = this.updateGameBoard(board, this.bot, boardValue, i, j);
+            String[][] newBoard = p.getKey();
+            int newBoardValue = p.getValue();
+
+            // list of empty spaces, remove the first empty space
+            List<int[]> copyEmptySpace = new ArrayList<>(emptySpace); // Create a copy of the list
+            copyEmptySpace.remove(0);
+
+            int[] res = this.minFunction(newBoard, copyEmptySpace, depth - 1, player, newBoardValue, alpha, beta);
+            int v = res[0];
+            alpha = res[1];
+            beta = res[2];
+            if (v > bestValue) {
+                bestValue = v;
+                bestMoveX = i;
+                bestMoveY = j;
+            }
+            // undo the move
+//            copyEmptySpace.add(0, space);
+
+            if (bestValue > alpha) {
+                alpha = bestValue;
+            }
+            if (beta <= alpha) {
+                System.out.println("prune");
+                break;
+            }
+            System.out.println("max empty space len 2: " + emptySpace.size());
+        }
+        return new int[]{bestValue, alpha, beta, bestMoveX, bestMoveY};
+    }
+
+    // minFunction is the opponent's move, return the board value, alpha, and beta
+    private int[] minFunction(String[][] board, List<int[]> emptySpace, int depth, String player, int boardValue, int alpha, int beta) {
+        System.out.println("mn depth: " + depth);
+//        System.out.println("min empty space: ");
+//        for (int[] space : emptySpace) {
+//            System.out.print("[" + space[0] + ", " + space[1] + "] ");
+//        }
+//        System.out.println();
+        // if depth = 0 (terminal state), then return
+        if (depth == 0) {
+            System.out.println("min depth == 0");
+            return new int[]{boardValue, alpha, beta};
+        }
+
+        // minFunction is the opponent's move
+        int bestValue = Integer.MAX_VALUE;
+        for (int[] space : emptySpace) {
+            int i = space[0];
+            int j = space[1];
+            Pair<String[][], Integer> p = this.updateGameBoard(board, this.player, boardValue, i, j);
+            String[][] newBoard = p.getKey();
+            int newBoardValue = p.getValue();
+
+            // list of empty spaces, remove the first empty space
+            List<int[]> copyEmptySpace = new ArrayList<>(emptySpace); // Create a copy of the list
+            copyEmptySpace.remove(0);
+            int[] res = this.maxFunction(newBoard, copyEmptySpace, depth - 1, bot, newBoardValue, alpha, beta);
+            int v = res[0];
+            alpha = res[1];
+            beta = res[2];
+            if (v < bestValue) {
+                bestValue = v;
+            }
+            // undo the move
+//            copyEmptySpace.add(0, space);
+
+            if (bestValue < beta) {
+                beta = bestValue;
+            }
+            if (beta <= alpha) {
+                System.out.println("beta <= alpha");
+                break;
+            }
+        }
+        return new int[]{bestValue, alpha, beta};
+    }
 }
