@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
 import java.lang.Math;
+import java.util.Random;
+
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
@@ -19,9 +21,9 @@ public class Bot {
         int depth_game = depthGame(rl, isBotFirst, emptySpaces.size());
         // initialize board value
         int boardValue = boardValue(board);
-        System.out.println("board value a: " + boardValue);
+        System.out.println("board value a before: " + boardValue);
         // print depth of game
-        System.out.println("max depth: " + depth_game);
+        System.out.println("max depth bfeor: " + depth_game);
 
         // start time
         long startTime = System.nanoTime();
@@ -43,7 +45,7 @@ public class Bot {
 //        System.out.println("before");
 //        printBoard(board);
 //        Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue, x, y);
-//        System.out.println("board value: " + p.getValue());
+//        System.out.println("board value after: " + boardValue(board));
 //        System.out.println("after");
 //        printBoard(p.getKey());
         return new int[]{x, y};
@@ -380,10 +382,98 @@ public class Bot {
         return new int[]{bestValue, alpha, beta};
     }
 
+    private double schedule(double T) {
+        return T - 0.1d;
+    }
+    private int[] simAnnealing(String[][] board, int depth) {
+        // Get empty spaces
+        List<int[]> emptySpaces = getEmptySpaces(board);
+
+        // Initialize current successor randomly
+        Random rand = new Random();
+        int[] currentCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
+        int bValue = boardValue(board);
+        double T = depth;
+        while (true) {
+            T = schedule(T);
+            if (T <= 0.0d) {
+                return currentCoord;
+            }
+            int[] nextCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
+
+            Pair<String[][], Integer> currentState = updateGameBoard(board, bot, bValue, currentCoord[0], currentCoord[1]);
+            Pair<String[][], Integer> nextState = updateGameBoard(board, bot, bValue, nextCoord[0], nextCoord[1]);
+
+            double deltaE = nextState.getValue() - currentState.getValue();
+//            System.out.println("deltaE = " + deltaE);
+//            System.out.println("currentCoord = " + currentCoord[0] + " " + currentCoord[1]);
+//            System.out.println("nextCoord = " + nextCoord[0] + " " + nextCoord[1]);
+//            System.out.println();
+//            System.out.println("T = " + T);
+//            System.out.println("Threshold = " + threshold);
+            if (deltaE > 0) {
+                currentCoord[0] = nextCoord[0]; currentCoord[1] = nextCoord[1];
+            } else {
+                double threshold = Math.exp(deltaE / T);
+//                System.out.println("deltaE = " + deltaE);
+//                System.out.println("T = " + T);
+//                System.out.println("Threshold = " + threshold);
+                if (Math.random() <= threshold) {
+                    currentCoord[0] = nextCoord[0]; currentCoord[1] = nextCoord[1];
+                }
+            }
 
 
-    // simulated annealing algorithm // hill climbing? stochastic hill climbing?
-//    private int[] simulatedAnnealing(String[][] board, List<int[]> emptySpace, int depth, int boardValue) {
+        }
+    }
 
+    private int[] stochasticHillClimbing(String[][] board) {
+        // Get empty spaces
+        List<int[]> emptySpaces = getEmptySpaces(board);
+
+        // Initialize current successor randomly
+        Random rand = new Random();
+        int[] currentCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
+        int bValue = boardValue(board);
+
+        //
+        int maxIterations = 100;
+
+        // Search loop
+        for (int i = 0; i < maxIterations; i++) {
+            int[] nextCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
+
+            // Find current state value and next state current value
+            Pair<String[][], Integer> currentState = updateGameBoard(board, bot, bValue, currentCoord[0], currentCoord[1]);
+            Pair<String[][], Integer> nextState = updateGameBoard(board, bot, bValue, nextCoord[0], nextCoord[1]);
+            if (currentState.getValue() < nextState.getValue()) {
+                currentCoord[0] = nextCoord[0]; currentCoord[1] = nextCoord[1];
+            }
+        }
+        return currentCoord;
+    }
+
+    private int[] steepestHillClimbing(String[][] board) {
+        // Get empty spaces
+        List<int[]> emptySpaces = getEmptySpaces(board);
+
+        // Initialize current successor with the first empty space coordinates
+        int[] currentCoord = emptySpaces.get(0);
+        int bValue = boardValue(board);
+
+        // Search loop
+        for (int[] nextCoord : emptySpaces) {
+
+            // Find next state and current state values
+            Pair<String[][], Integer> currentState = updateGameBoard(board, bot, bValue, currentCoord[0], currentCoord[1]);
+            Pair<String[][], Integer> nextState = updateGameBoard(board, bot, bValue, nextCoord[0], nextCoord[1]);
+
+            if (currentState.getValue() < nextState.getValue()) {
+                currentCoord[0] = nextCoord[0]; currentCoord[1] = nextCoord[1];
+            }
+        }
+
+        return currentCoord;
+    }
 
 }
