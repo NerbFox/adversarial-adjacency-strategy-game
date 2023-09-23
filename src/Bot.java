@@ -69,13 +69,40 @@ public class Bot {
         return boardText;
     }
 
-    // return empty spaces on board list of tuples int
+    // Function to get empty spaces
     private List<int[]> getEmptySpaces(String[][] board) {
+        return getEmptySpacesHeuristic(board);
+    }
+
+    // get empty spaces that return list of tuples int (all empty spaces)
+    private List<int[]> getEmptySpacesNormal(String[][] board) {
         List<int[]> emptySpaces = new ArrayList<int[]>();
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++){
                 if (board[i][j].equals("")) {
                     emptySpaces.add(new int[]{i, j});
+                }
+            }
+        }
+        return emptySpaces;
+    }
+
+    // Heuristic function for empty spaces (empty spaces that have a piece on the left, right, up, or down)
+    // get empty spaces that return list of tuples int that the bot left or right or up or down has a piece
+    private List<int[]> getEmptySpacesHeuristic(String[][] board) {
+        List<int[]> emptySpaces = new ArrayList<int[]>();
+        for (int i = 0; i < ROW; i++) {
+            for (int j = 0; j < COL; j++){
+                if (board[i][j].equals("")) {
+                    if (i - 1 >= 0 && (board[i - 1][j].equals(player) || board[i - 1][j].equals(bot))) {
+                        emptySpaces.add(new int[]{i, j});
+                    } else if (i + 1 < ROW && (board[i + 1][j].equals(player) || board[i + 1][j].equals(bot))) {
+                        emptySpaces.add(new int[]{i, j});
+                    } else if (j - 1 >= 0 && (board[i][j - 1].equals(player) || board[i][j - 1].equals(bot))) {
+                        emptySpaces.add(new int[]{i, j});
+                    } else if (j + 1 < COL && (board[i][j + 1].equals(player) || board[i][j + 1].equals(bot))) {
+                        emptySpaces.add(new int[]{i, j});
+                    }
                 }
             }
         }
