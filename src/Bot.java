@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
 import java.lang.Math;
+
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
@@ -11,8 +12,6 @@ public class Bot {
     public int[] move(Button[][] b, int rl, boolean isBotFirst) {
         // initialize board
         String[][] board = getBoard(b);
-        // initialize values for board arraylist
-        List<Integer> boardValues = new ArrayList<Integer>();
         // initialize empty spaces on board
         List<int[]> emptySpaces = getEmptySpaces(board);
         // initialize depth of game (terminal depth)
@@ -22,7 +21,7 @@ public class Bot {
         System.out.println("board value a: " + boardValue);
         // print depth of game
         System.out.println("max depth: " + depth_game);
-
+        printBoard(board);
         // start time
         long startTime = System.nanoTime();
         int[] res = this.minimaxDecision(board, emptySpaces, depth_game, boardValue);
@@ -140,7 +139,7 @@ public class Bot {
             }
         }
 
-        Pair<String[][], Integer> p = new Pair<String[][], Integer>(newBoard1, boardValue);
+        Pair<String[][], Integer> p = new Pair<>(newBoard1, boardValue);
         for (int x = startRow; x <= endRow; x++) {
             p = this.setBoard(p, player, x, j);
         }
@@ -155,7 +154,7 @@ public class Bot {
             newBoard[i][j] = bot;
             delta++;
         } else {
-            newBoard[i][j] = player;
+            newBoard[i][j] = this.player;
             delta--;
         }
         p = new Pair<>(newBoard, delta);
@@ -166,18 +165,18 @@ public class Bot {
     private Pair<String[][], Integer> setBoard(Pair<String[][], Integer> p, String player, int i, int j) {
         int delta = p.getValue();
         String[][] board = p.getKey();
-        if (player.equals("X")) {
-            if (board[i][j].equals("O")) {
-                board[i][j] = "X";
+        if (player.equals(this.player)) {
+            if (board[i][j].equals(this.bot)) {
+                board[i][j] = this.player;
                 // x++, o--
                 delta -= 2;
             }
-        } else if (board[i][j].equals("X")) {
-            board[i][j] = "O";
+        } else if (board[i][j].equals(this.player)) {
+            board[i][j] = this.bot;
             // x--, o++
             delta += 2;
         }
-        return new Pair<String[][], Integer>(board, delta);
+        return new Pair<>(board, delta);
     }
 
     // objective function for board state
@@ -197,16 +196,31 @@ public class Bot {
         return value;
     }
 
+    private List<int[]> copyEmptySpaces(List<int[]> emptySpaces) {
+        List<int[]> newEmptySpaces = new ArrayList<int[]>();
+        for (int[] space : emptySpaces) {
+            newEmptySpaces.add(new int[]{space[0], space[1]});
+        }
+        return newEmptySpaces;
+    }
+
+    private String[][] copyBoard(String[][] board) {
+        String[][] newBoard = new String[8][8];
+        for (int x = 0; x < ROW; x++) {
+            System.arraycopy(board[x], 0, newBoard[x], 0, COL);
+        }
+        return newBoard;
+    }
+
     private int[] minimaxDecision2(String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta, boolean isMaximizing) {
         if (depth == 0) {
-//            int boardValue = boardValue(board);
-//            return new int[]{boardValue, -1, -1};  // need more time to evaluate the board
-            return new int[]{bvalue, -1, -1};
+            return new int[]{bvalue, -1, -1, alpha, beta};
         }
 
         int bestValue;
         int bestX = -1;
         int bestY = -1;
+        int newBvalue = boardValue(board);
 
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
@@ -214,18 +228,17 @@ public class Bot {
 //                System.out.println("length: " + emptySpaces.size());
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue(board), i, j);
-                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
+                Pair<String[][], Integer> p = updateGameBoard(board, bot, newBvalue, i, j);
+                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces;
+
+
+
                 newEmptySpaces.remove(0);
                 int[] res = minimaxDecision2(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, false);
                 int v = res[0];
 
                 if (v > bestValue) {
                     bestValue = v;
-//                    if (depth == 3) {
-//                        System.out.println("bestValue: " + bestValue);
-//                        System.out.println("i: " + i + " j: " + j);
-//                    }
                     bestX = i;
                     bestY = j;
                 }
@@ -240,16 +253,18 @@ public class Bot {
             for (int[] space : emptySpaces) {
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, player, boardValue(board), i, j);
+                Pair<String[][], Integer> p = updateGameBoard(board, player, newBvalue, i, j);
                 List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
+                // copy the emptySpaces, (
+//                newEmptySpaces = copyEmptySpaces(emptySpaces);
+
                 newEmptySpaces.remove(0);
                 int[] res = minimaxDecision2(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, true);
                 int v = res[0];
 
                 if (v < bestValue) {
                     bestValue = v;
-//                    bestX = i;
-//                    bestY = j;
+
                 }
 
                 beta = Math.min(beta, bestValue);
@@ -259,7 +274,7 @@ public class Bot {
             }
         }
 
-        return new int[]{bestValue, bestX, bestY};
+        return new int[]{bestValue, bestX, bestY, alpha, beta};
     }
 
 
@@ -273,6 +288,7 @@ public class Bot {
         System.out.println("alpha: " + alpha + " beta: " + beta);
         int[] res = this.minimaxDecision2(board, emptySpace, boardValue, depth, alpha, beta, true);
         System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
+        System.out.println("alpha: " + res[3] + " beta: " + res[4]);
         return new int[]{res[1], res[2]};
 //        int[] res = this.maxFunction(board, emptySpace, depth, bot, boardValue, alpha, beta);
 //        System.out.println("finish minmax with res: " + res[0] + " alpha: " + res[1] + " beta: " + res[2] + " x: " + res[3] + " y: " + res[4]);
@@ -379,11 +395,6 @@ public class Bot {
         }
         return new int[]{bestValue, alpha, beta};
     }
-
-
-
-    // simulated annealing algorithm // hill climbing? stochastic hill climbing?
-//    private int[] simulatedAnnealing(String[][] board, List<int[]> emptySpace, int depth, int boardValue) {
 
 
 }
