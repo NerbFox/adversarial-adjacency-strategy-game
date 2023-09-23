@@ -69,6 +69,11 @@ public class Bot {
         return boardText;
     }
 
+    // return true if s is bot or player
+    private boolean isBotOrPlayer(String s) {
+        return s.equals(bot) || s.equals(player);
+    }
+
     // Function to get empty spaces
     private List<int[]> getEmptySpaces(String[][] board) {
         return getEmptySpacesHeuristic(board);
@@ -90,19 +95,25 @@ public class Bot {
     // Heuristic function for empty spaces (empty spaces that have a piece on the left, right, up, or down)
     // get empty spaces that return list of tuples int that the bot left or right or up or down has a piece
     private List<int[]> getEmptySpacesHeuristic(String[][] board) {
-        List<int[]> emptySpaces = new ArrayList<int[]>();
+        List<int[]> emptySpaces = new ArrayList<>();
+        boolean moreSpace = true;
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++){
                 if (board[i][j].equals("")) {
-                    if (i - 1 >= 0 && (board[i - 1][j].equals(player) || board[i - 1][j].equals(bot))) {
-                        emptySpaces.add(new int[]{i, j});
-                    } else if (i + 1 < ROW && (board[i + 1][j].equals(player) || board[i + 1][j].equals(bot))) {
-                        emptySpaces.add(new int[]{i, j});
-                    } else if (j - 1 >= 0 && (board[i][j - 1].equals(player) || board[i][j - 1].equals(bot))) {
-                        emptySpaces.add(new int[]{i, j});
-                    } else if (j + 1 < COL && (board[i][j + 1].equals(player) || board[i][j + 1].equals(bot))) {
-                        emptySpaces.add(new int[]{i, j});
+                    if (i - 1 >= 0) {
+                        if (isBotOrPlayer(board[i - 1][j])) { emptySpaces.add(new int[]{i, j}); }
+                    } else if (i + 1 < ROW) {
+                        if (isBotOrPlayer(board[i + 1][j])) { emptySpaces.add(new int[]{i, j}); }
+                    } else if (j - 1 >= 0 ) {
+                        if (isBotOrPlayer(board[i][j - 1])) { emptySpaces.add(new int[]{i, j}); }
+                    } else if (j + 1 < COL) {
+                        if (isBotOrPlayer(board[i][j + 1])) { emptySpaces.add(new int[]{i, j}); }
                     }
+//                    else if (moreSpace){
+//                        // add one more empty space that not have a piece on the left, right, up, or down
+//                        moreSpace = false;
+//                        emptySpaces.add(new int[]{i, j});
+//                    }
                 }
             }
         }
