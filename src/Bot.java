@@ -4,11 +4,13 @@ import java.util.List;
 import javafx.util.Pair;
 import java.lang.Math;
 import java.util.Random;
+
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
     private String bot = "O";
     private String player = "X";
+
     public int[] move(Button[][] b, int rl, boolean isBotFirst) {
         // initialize board
         String[][] board = getBoard(b);

@@ -1,16 +1,40 @@
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class Chromosome {
-  public ArrayList<int[]> getSequence() {
-    return null;
-  }
+    private List<int[]> sequence;
+    private int fitnessValue;
 
-  public void setFitness(int f) {
+    public Chromosome(List<int[]> sequence) {
+        this.sequence = sequence;
+        this.fitnessValue = Integer.MIN_VALUE;
+    }
 
-  }
+    public List<int[]> getSequence() {
+        return this.sequence;
+    }
 
-  public int getFitness() {
-    return 0;
-  }
+    public int[] getAt(int i) {
+        return this.sequence.get(i);
+    }
+
+    public int getFitness() {
+        return this.fitnessValue;
+    }
+
+    public void setSequence(ArrayList<int[]> sequence) {
+        this.sequence = sequence;
+    }
+
+    public void replaceAt(int i, int[] val) {
+        this.sequence.set(i, val);
+    }
+
+    public void setFitness(int f) {
+        this.fitnessValue = f;
+    }
+
+    public int len() {
+        return sequence.size();
+    }
 }
