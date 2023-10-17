@@ -8,8 +8,8 @@ import java.util.Random;
 public class Bot {
     private static final int ROW = 8;
     private static final int COL = 8;
-    private String bot = "O";
-    private String player = "X";
+    public static final String bot = "O";
+    public static final String player = "X";
 
     public int[] move(Button[][] b, int rl, boolean isBotFirst) {
         // initialize board
@@ -26,7 +26,8 @@ public class Bot {
         printBoard(board);
         // start time
         long startTime = System.nanoTime();
-         int[] res = this.minimax(board, emptySpaces, depth_game, boardValue);
+        MinimaxAlgorithm mm = new MinimaxAlgorithm();
+        int[] res = mm.minimax(board, emptySpaces, depth_game, boardValue);
 //        GeneticAlgorithm ga = new GeneticAlgorithm();
 //        int[] res = ga.GeneticAlgo(board, emptySpaces);
         // end time
@@ -70,9 +71,9 @@ public class Bot {
     // Function to get empty spaces
     private List<int[]> getEmptySpaces(String[][] board) {
 //        return getEmptySpacesNormal(board);
+        // yg heuristic cuma untuk minimax
         return getEmptySpacesHeuristic(board);
     }
-
 
     // get empty spaces that return list of tuples int (all empty spaces)
     private List<int[]> getEmptySpacesNormal(String[][] board) {
@@ -151,7 +152,7 @@ public class Bot {
     }
 
     // move function, return the board and board value
-    private Pair<String[][], Integer> updateGameBoard(String[][] board, String player, int boardValue, int i, int j) {
+    public static Pair<String[][], Integer> updateGameBoard(String[][] board, String player, int boardValue, int i, int j) {
         // Value of indices to control the lower/upper bound of rows and columns
         // in order to change surrounding/adjacent X's and O's only on the game board.
         // Four boundaries: First & last row and first & last column.
@@ -181,14 +182,14 @@ public class Bot {
         // Search for adjacency for X's and O's or vice versa, and replace them.
         // Update scores for X's and O's accordingly.
         // copy the board
-        String[][] newBoard1 = this.copyBoard(board);
+        String[][] newBoard1 = copyBoard(board);
 
         Pair<String[][], Integer> p = new Pair<>(newBoard1, boardValue);
         for (int x = startRow; x <= endRow; x++) {
-            p = this.setBoard(p, player, x, j);
+            p = setBoard(p, player, x, j);
         }
         for (int y = startColumn; y <= endColumn; y++) {
-            p = this.setBoard(p, player, i, y);
+            p = setBoard(p, player, i, y);
         }
 
         String[][] newBoard = p.getKey();
@@ -198,7 +199,7 @@ public class Bot {
             newBoard[i][j] = bot;
             delta++;
         } else {
-            newBoard[i][j] = this.player;
+            newBoard[i][j] = Bot.player;
             delta--;
         }
         p = new Pair<>(newBoard, delta);
@@ -206,28 +207,26 @@ public class Bot {
     }
 
     // set board
-    private Pair<String[][], Integer> setBoard(Pair<String[][], Integer> p, String player, int i, int j) {
+    private static Pair<String[][], Integer> setBoard(Pair<String[][], Integer> p, String player, int i, int j) {
         int delta = p.getValue();
         String[][] board = p.getKey();
-        if (player.equals(this.player)) {
-            if (board[i][j].equals(this.bot)) {
-                board[i][j] = this.player;
+        if (player.equals(Bot.player)) {
+            if (board[i][j].equals(Bot.bot)) {
+                board[i][j] = Bot.player;
                 // x++, o--
                 delta -= 2;
             }
-        } else if (board[i][j].equals(this.player)) {
-            board[i][j] = this.bot;
+        } else if (board[i][j].equals(Bot.player)) {
+            board[i][j] = Bot.bot;
             // x--, o++
             delta += 2;
         }
         return new Pair<>(board, delta);
     }
 
-    // objective function for board state
-    // the objective function is the sum of the values of each row, column, and
-    // diagonal where O is +1 and X is -1
-    // value = sumOfO - sumOfX
-    private int boardValue(String[][] board) {
+    // the objective function is the sum of the values of each row, column, and diagonal
+    // where O is +1 and X is -1, value = sumOfO - sumOfX
+    public static int boardValue(String[][] board) {
         int value = 0;
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
@@ -240,83 +239,12 @@ public class Bot {
         }
         return value;
     }
-
-    private String[][] copyBoard(String[][] board) {
+    private static String[][] copyBoard(String[][] board) {
         String[][] newBoard = new String[8][8];
         for (int x = 0; x < ROW; x++) {
             System.arraycopy(board[x], 0, newBoard[x], 0, COL);
         }
         return newBoard;
-    }
-
-    // minimax algorithm with alpha-beta pruning
-    // minFunction is the opponent's move
-    // maxFunction is the bot's move
-    private int[] minimax(String[][] board, List<int[]> emptySpace, int depth, int boardValue) {
-        int alpha = Integer.MIN_VALUE; // -infinity
-        int beta = Integer.MAX_VALUE; // +infinity
-        System.out.println("alpha: " + alpha + " beta: " + beta);
-        int[] res = this.minimaxDecision(board, emptySpace, boardValue, depth, alpha, beta, true);
-        System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
-        System.out.println("alpha: " + res[3] + " beta: " + res[4]);
-        return new int[] { res[1], res[2] };
-    }
-
-    private int[] minimaxDecision(String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta,
-            boolean isMaximizing) {
-        if (depth == 0) {
-            bvalue = boardValue(board);
-            return new int[] { bvalue, -1, -1, alpha, beta };
-        }
-        int bestValue;
-        int bestX = -1;
-        int bestY = -1;
-
-        if (isMaximizing) {
-            bestValue = Integer.MIN_VALUE;
-            for (int[] space : emptySpaces) {
-                int i = space[0];
-                int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, bot, bvalue, i, j);
-                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces;
-                newEmptySpaces.remove(0);
-
-                int[] res = minimaxDecision(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, false);
-                int v = res[0];
-                if (v > bestValue) {
-                    bestValue = v;
-                    bestX = i;
-                    bestY = j;
-                }
-
-                alpha = Math.max(alpha, bestValue);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-        } else {
-            bestValue = Integer.MAX_VALUE;
-            for (int[] space : emptySpaces) {
-                int i = space[0];
-                int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, player, bvalue, i, j);
-                List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
-                newEmptySpaces.remove(0);
-
-                int[] res = minimaxDecision(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, true);
-                int v = res[0];
-                if (v < bestValue) {
-                    bestValue = v;
-
-                }
-
-                beta = Math.min(beta, bestValue);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-        }
-        return new int[] { bestValue, bestX, bestY, alpha, beta };
     }
 
     private double schedule(double T) {
@@ -420,5 +348,4 @@ public class Bot {
 
         return currentCoord;
     }
-
 }
