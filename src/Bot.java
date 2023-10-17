@@ -260,7 +260,7 @@ public class Bot {
         int bestValue;
         int bestX = -1;
         int bestY = -1;
-        int newBvalue = boardValue(board);
+        int newBvalue = boardValue(board); // Why menghitung lagi????
 
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
