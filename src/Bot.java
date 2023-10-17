@@ -88,10 +88,7 @@ public class Bot {
         return emptySpaces;
     }
 
-    // Heuristic function for empty spaces (empty spaces that have a piece on the
-    // left, right, up, or down)
-    // get empty spaces that return list of tuples int that the bot left or right or
-    // up or down has a piece
+    // Heuristic function for empty spaces (empty spaces that have a piece on the left, right, up, or down)
     private List<int[]> getEmptySpacesHeuristic(String[][] board) {
         List<int[]> emptySpaces = new ArrayList<>();
         boolean moreSpace = true;
