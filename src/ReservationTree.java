@@ -24,11 +24,15 @@ public class ReservationTree {
     this.updateTreeValue(this.root);
 
     chromosomes.stream().forEach(chromosome -> {
-      ArrayList<int[]> sequence = chromosome.getSequence();
+      List<int[]> sequence = chromosome.getSequence();
 
       int depth = 1;
       int lastCommonDepth = 1;
       TreeNode currNode = this.root;
+
+      if (currNode.getValue() != chromosome.getFitness()) {
+        lastCommonDepth++;
+      }
 
       for (int i = 0; i < sequence.size(); i++) {
         currNode = currNode.getChildren().get(sequence.get(i));
@@ -38,16 +42,18 @@ public class ReservationTree {
           lastCommonDepth++;
         }
       }
+      chromosome.setFitness(depth - lastCommonDepth + 1);
 
-      chromosome.setFitness(depth-lastCommonDepth+1);
     });
 
     Collections.sort(chromosomes, Comparator.comparingInt(Chromosome::getFitness));
-    return chromosomes;
+    Collections.reverse(chromosomes);
+
+    return chromosomes.subList(0, 4);
   }
 
   private void updateTreeNode(Chromosome chromosome, String[][] board) {
-    ArrayList<int[]> sequence = chromosome.getSequence();
+    List<int[]> sequence = chromosome.getSequence();
 
     Pair<String[][], Integer> boardVal = new Pair<>(board, this.boardValue(board));
     TreeNode currNode = this.root;
@@ -58,7 +64,8 @@ public class ReservationTree {
       if (currNode.getChildren().containsKey(currMove)) {
         currNode = currNode.getChildren().get(currMove);
       } else {
-        currNode = currNode.getChildren().put(currMove, new TreeNode(isBot));
+        currNode.getChildren().put(currMove, new TreeNode(isBot));
+        currNode = currNode.getChildren().get(currMove);
       }
 
       String currChar = isBot ? "O" : "X";
@@ -68,7 +75,10 @@ public class ReservationTree {
         currNode.setValue(boardVal.getValue());
         chromosome.setFitness(currNode.getValue());
       }
+
+      isBot = !isBot;
     }
+
   }
 
   private int updateTreeValue(TreeNode currNode) {
@@ -79,7 +89,6 @@ public class ReservationTree {
     currNode.getChildren().entrySet().stream().forEach(branchMap -> {
       TreeNode child = branchMap.getValue();
       int childValue = this.updateTreeValue(child);
-
       if (currNode.isMaximizer() && childValue > currNode.getValue()) {
         currNode.setValue(childValue);
       } else if (!currNode.isMaximizer() && childValue < currNode.getValue()) {
@@ -88,6 +97,24 @@ public class ReservationTree {
     });
 
     return currNode.getValue();
+  }
+
+  private void printTree(TreeNode currNode) {
+    if (currNode.getChildren().isEmpty()) {
+      System.out.print(currNode.getValue());
+      // return currNode.getValue();
+      return;
+    }
+    System.out.print(currNode.getValue());
+    System.out.print("(");
+    currNode.getChildren().entrySet().stream().forEach(branchMap -> {
+      TreeNode child = branchMap.getValue();
+      this.printTree(child);
+    });
+    System.out.print(")");
+
+    // return currNode.getValue();
+    return;
   }
 
   // ! INI FUNGSI HARUSNYA NTAR DIPINDAHIN
