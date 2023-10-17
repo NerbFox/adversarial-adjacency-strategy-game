@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinimaxAlgorithm {
+    private final int alpha = Integer.MIN_VALUE; // -infinity
+    private final int beta = Integer.MAX_VALUE; // +infinity
+
     // minimax algorithm with alpha-beta pruning
     public int[] minimax(String[][] board, List<int[]> emptySpace, int depth, int boardValue) {
-    int alpha = Integer.MIN_VALUE; // -infinity
-    int beta = Integer.MAX_VALUE; // +infinity
-    System.out.println("alpha: " + alpha + " beta: " + beta);
-    int[] res = this.minimaxDecision(board, emptySpace, boardValue, depth, alpha, beta, true);
-    System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
-    System.out.println("alpha: " + res[3] + " beta: " + res[4]);
-    return new int[] { res[1], res[2] };
-}
+        System.out.println("alpha: " + alpha + " beta: " + beta);
+        int[] res = this.minimaxDecision(board, emptySpace, boardValue, depth, alpha, beta, true);
+        System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
+        System.out.println("alpha: " + res[3] + " beta: " + res[4]);
+        return new int[] { res[1], res[2] };
+    }
 
     private int[] minimaxDecision(String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta,
                                   boolean isMaximizing) {
