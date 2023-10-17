@@ -26,9 +26,9 @@ public class Bot {
         printBoard(board);
         // start time
         long startTime = System.nanoTime();
-        // int[] res = this.minimax(board, emptySpaces, depth_game, boardValue);
-        GeneticAlgorithm ga = new GeneticAlgorithm();
-        int[] res = ga.GeneticAlgo(board, emptySpaces);
+         int[] res = this.minimax(board, emptySpaces, depth_game, boardValue);
+//        GeneticAlgorithm ga = new GeneticAlgorithm();
+//        int[] res = ga.GeneticAlgo(board, emptySpaces);
         // end time
         long endTime = System.nanoTime();
         // print time
@@ -38,18 +38,7 @@ public class Bot {
         int y = res[1];
         System.out.println("x" + x);
         System.out.println("y" + y);
-        return new int[] { x, y };
-
-        // int randomMove = (int) (Math.random()*emptySpaces.size());
-        // x = emptySpaces.get(randomMove)[0];
-        // y = emptySpaces.get(randomMove)[1];
-        // System.out.println("before");
-        // printBoard(board);
-        // Pair<String[][], Integer> p = updateGameBoard(board, bot, boardValue, x, y);
-        // System.out.println("board value after: " + boardValue(board));
-        // System.out.println("after");
-        // printBoard(p.getKey());
-        // return new int[]{(int) (Math.random()*8), (int) (Math.random()*8)};
+        return new int[]{x, y};
     }
 
     // print board
@@ -80,8 +69,10 @@ public class Bot {
 
     // Function to get empty spaces
     private List<int[]> getEmptySpaces(String[][] board) {
-        return getEmptySpacesNormal(board);
+//        return getEmptySpacesNormal(board);
+        return getEmptySpacesHeuristic(board);
     }
+
 
     // get empty spaces that return list of tuples int (all empty spaces)
     private List<int[]> getEmptySpacesNormal(String[][] board) {
@@ -106,31 +97,36 @@ public class Bot {
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
                 if (board[i][j].equals("")) {
-                    if (i - 1 >= 0) {
+                    if (i - 1 >= 0) { // check if the bot or player is on the left
                         if (isBotOrPlayer(board[i - 1][j])) {
-                            emptySpaces.add(new int[] { i, j });
+                            emptySpaces.add(new int[] { i, j }); continue;
                         }
-                    } else if (i + 1 < ROW) {
+                    }  if (i + 1 < ROW) { // check if the bot or player is on the right
                         if (isBotOrPlayer(board[i + 1][j])) {
-                            emptySpaces.add(new int[] { i, j });
+                            emptySpaces.add(new int[] { i, j }); continue;
                         }
-                    } else if (j - 1 >= 0) {
+
+                    }  if (j - 1 >= 0) { // check if the bot or player is on the up
                         if (isBotOrPlayer(board[i][j - 1])) {
-                            emptySpaces.add(new int[] { i, j });
+                            emptySpaces.add(new int[] { i, j }); continue;
                         }
-                    } else if (j + 1 < COL) {
+                    }  if (j + 1 < COL) { // check if the bot or player is on the down
                         if (isBotOrPlayer(board[i][j + 1])) {
                             emptySpaces.add(new int[] { i, j });
                         }
                     }
-                    // else if (moreSpace){
-                    // // add one more empty space that not have a piece on the left, right, up, or
-                    // down
-                    // moreSpace = false;
-                    // emptySpaces.add(new int[]{i, j});
-                    // }
+//                     if (moreSpace && !add) {
+//                     // add one more empty space that not have a piece on the left, right, up, or down
+//                     moreSpace = false;
+//                     emptySpaces.add(new int[]{i, j});
+//                     }
+
                 }
             }
+        }
+//        print empty spaces
+        for (int[] emptySpace : emptySpaces) {
+            System.out.println("empty space: " + emptySpace[0] + " " + emptySpace[1]);
         }
         return emptySpaces;
     }
@@ -264,36 +260,29 @@ public class Bot {
         System.out.println("finish minmax with res: " + res[0] + " x: " + res[1] + " y: " + res[2]);
         System.out.println("alpha: " + res[3] + " beta: " + res[4]);
         return new int[] { res[1], res[2] };
-        // int[] res = this.maxFunction(board, emptySpace, depth, bot, boardValue,
-        // alpha, beta);
-        // System.out.println("finish minmax with res: " + res[0] + " alpha: " + res[1]
-        // + " beta: " + res[2] + " x: " + res[3] + " y: " + res[4]);
-        // return new int[]{res[3], res[4]};
     }
 
     private int[] minimaxDecision(String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta,
             boolean isMaximizing) {
         if (depth == 0) {
+            bvalue = boardValue(board);
             return new int[] { bvalue, -1, -1, alpha, beta };
         }
-
         int bestValue;
         int bestX = -1;
         int bestY = -1;
-        int newBvalue = boardValue(board); // Why menghitung lagi????
 
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
             for (int[] space : emptySpaces) {
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, bot, newBvalue, i, j);
+                Pair<String[][], Integer> p = updateGameBoard(board, bot, bvalue, i, j);
                 List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces;
-
                 newEmptySpaces.remove(0);
+
                 int[] res = minimaxDecision(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, false);
                 int v = res[0];
-
                 if (v > bestValue) {
                     bestValue = v;
                     bestX = i;
@@ -310,13 +299,12 @@ public class Bot {
             for (int[] space : emptySpaces) {
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = updateGameBoard(board, player, newBvalue, i, j);
+                Pair<String[][], Integer> p = updateGameBoard(board, player, bvalue, i, j);
                 List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
-
                 newEmptySpaces.remove(0);
+
                 int[] res = minimaxDecision(p.getKey(), newEmptySpaces, p.getValue(), depth - 1, alpha, beta, true);
                 int v = res[0];
-
                 if (v < bestValue) {
                     bestValue = v;
 
@@ -328,7 +316,6 @@ public class Bot {
                 }
             }
         }
-
         return new int[] { bestValue, bestX, bestY, alpha, beta };
     }
 
