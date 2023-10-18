@@ -1,14 +1,11 @@
 package core.algorithms.genetic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import core.Board;
+import core.Bot;
 import javafx.util.Pair;
 
 public class ReservationTree {
@@ -18,9 +15,9 @@ public class ReservationTree {
     this.root = new TreeNode(true);
   }
 
-  public List<Chromosome> getTopChromosomes(List<Chromosome> chromosomes, String[][] board) {
+  public List<Chromosome> getTopChromosomes(Bot bot, List<Chromosome> chromosomes, String[][] board) {
     chromosomes.stream().forEach(chromosome -> {
-      this.updateTreeNode(chromosome, board);
+      this.updateTreeNode(bot, chromosome, board);
     });
 
     this.updateTreeValue(this.root);
@@ -54,7 +51,7 @@ public class ReservationTree {
     return chromosomes.subList(0, 4);
   }
 
-  private void updateTreeNode(Chromosome chromosome, String[][] board) {
+  private void updateTreeNode(Bot bot, Chromosome chromosome, String[][] board) {
     List<int[]> sequence = chromosome.getSequence();
 
     Pair<String[][], Integer> boardVal = new Pair<>(board, Board.boardValue(board));
@@ -71,7 +68,7 @@ public class ReservationTree {
       }
 
       String currChar = isBot ? "O" : "X";
-      boardVal = Board.updateGameBoard(boardVal.getKey(), currChar, boardVal.getValue(), currMove[0], currMove[1]);
+      boardVal = Board.updateGameBoard(bot, boardVal.getKey(), currChar, boardVal.getValue(), currMove[0], currMove[1]);
 
       if (i == sequence.size() - 1) {
         currNode.setValue(boardVal.getValue());

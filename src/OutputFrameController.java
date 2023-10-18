@@ -1,3 +1,4 @@
+import core.algorithms.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,12 +16,7 @@ import javafx.scene.layout.RowConstraints;
 
 import java.io.IOException;
 
-import core.bot.Bot;
-import core.bot.BotGenetic;
-import core.bot.BotMinimax;
-import core.bot.BotSimulatedAnnealing;
-import core.bot.BotSteepestHillClimbing;
-import core.bot.BotStochasticHillClimbing;
+import core.Bot;
 
 /**
  * The OutputFrameController class. It controls button input from the users when
@@ -99,28 +95,28 @@ public class OutputFrameController {
                 }
             }
         } else if (player1Type.equals("minimax")) {
-            this.botPlayer1 = new BotMinimax();
+            this.botPlayer1 = new Bot(true, new MinimaxAlgorithm());
         } else if (player1Type.equals("genetic algorithm")) {
-            this.botPlayer1 = new BotGenetic();
+            this.botPlayer1 = new Bot(true, new GeneticAlgorithm());
         } else if (player1Type.equals("simulated annealing")) {
-            this.botPlayer1 = new BotSimulatedAnnealing();
+            this.botPlayer1 = new Bot(true, new SimulatedAnnealing());
         } else if (player1Type.equals("stochastic hill climbing")) {
-            this.botPlayer1 = new BotStochasticHillClimbing();
+            this.botPlayer1 = new Bot(true, new StochasticHillClimbing());
         } else if (player1Type.equals("steepest hill climbing")) {
-            this.botPlayer1 = new BotSteepestHillClimbing();
+            this.botPlayer1 = new Bot(true, new SteepestHillClimbing());
         }
 
         // tipe player 2
         if (player2Type.equals("minimax")) {
-            this.botPlayer2 = new BotMinimax();
+            this.botPlayer2 = new Bot(false, new MinimaxAlgorithm());
         } else if (player2Type.equals("genetic algorithm")) {
-            this.botPlayer2 = new BotGenetic();
+            this.botPlayer2 = new Bot(false, new GeneticAlgorithm());
         } else if (player2Type.equals("simulated annealing")) {
-            this.botPlayer2 = new BotSimulatedAnnealing();
+            this.botPlayer2 = new Bot(false, new SimulatedAnnealing());
         } else if (player2Type.equals("stochastic hill climbing")) {
-            this.botPlayer2 = new BotStochasticHillClimbing();
+            this.botPlayer2 = new Bot(false, new StochasticHillClimbing());
         } else if (player2Type.equals("steepest hill climbing")) {
-            this.botPlayer2 = new BotSteepestHillClimbing();
+            this.botPlayer2 = new Bot(false, new SteepestHillClimbing());
         }
         this.playerXTurn = !isBotFirst;
 

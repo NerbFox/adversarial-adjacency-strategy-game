@@ -4,11 +4,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import core.Board;
 import core.algorithms.genetic.Chromosome;
 import core.algorithms.genetic.ReservationTree;
+import core.Bot;
 
-public class GeneticAlgorithm {
-    public int[] GeneticAlgo(String[][] board, List<int[]> emptySpaces) {
+public class GeneticAlgorithm implements MoveCreator {
+    public int[] makeMove(Bot bot, String[][] board, int depth) {
+        List<int[]> emptySpaces = Board.getEmptySpaces(board);
+
         long startTime = System.currentTimeMillis();
 
         List<Chromosome> chromosomes = new ArrayList<Chromosome>(5);
@@ -25,7 +29,7 @@ public class GeneticAlgorithm {
         int i = 0;
         while (i < 20 && System.currentTimeMillis() - startTime <= 5000) {
 
-            List<Chromosome> parentGeneration = resTree.getTopChromosomes(chromosomes, board);
+            List<Chromosome> parentGeneration = resTree.getTopChromosomes(bot, chromosomes, board);
             List<Chromosome> selected = this.selection(parentGeneration);
             List<Chromosome> crossed = this.crossover(selected);
             List<Chromosome> mutated = this.mutateAll(crossed);
@@ -38,7 +42,7 @@ public class GeneticAlgorithm {
             i++;
         }
 
-        List<Chromosome> resList = resTree.getTopChromosomes(chromosomes, board);
+        List<Chromosome> resList = resTree.getTopChromosomes(bot, chromosomes, board);
 
         return resList.get(0).getAt(0);
     }

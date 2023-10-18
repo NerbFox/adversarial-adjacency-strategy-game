@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Random;
 
 import core.Board;
-import core.bot.Bot;
+import core.Bot;
 import javafx.util.Pair;
 
-public class SimulatedAnnealing {
+public class SimulatedAnnealing implements MoveCreator {
     private double schedule(double T) {
     return T - 0.1d;
   }
 
-  public int[] simAnnealing(String[][] board, int depth) {
+    public int[] makeMove(Bot bot, String[][] board, int depth) {
     // Get empty spaces
     List<int[]> emptySpaces = Board.getEmptySpaces(board);
     
@@ -28,9 +28,9 @@ public class SimulatedAnnealing {
       }
       int[] nextCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
       
-      Pair<String[][], Integer> currentState = Board.updateGameBoard(board, Bot.bot, bValue, currentCoord[0],
+      Pair<String[][], Integer> currentState = Board.updateGameBoard(bot, board, bot.me, bValue, currentCoord[0],
           currentCoord[1]);
-      Pair<String[][], Integer> nextState = Board.updateGameBoard(board, Bot.bot, bValue, nextCoord[0], nextCoord[1]);
+      Pair<String[][], Integer> nextState = Board.updateGameBoard(bot, board, bot.me, bValue, nextCoord[0], nextCoord[1]);
 
       double deltaE = nextState.getValue() - currentState.getValue();
 

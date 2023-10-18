@@ -1,27 +1,35 @@
-package core.bot;
+package core;
+
+import core.Board;
+import core.algorithms.MoveCreator;
+import javafx.scene.control.Button;
 
 import java.util.List;
 
-import core.Board;
-import core.algorithms.SimulatedAnnealing;
-import javafx.scene.control.Button;
+public class Bot  {
+  public String me; //
+  public String enemy; //
+  private MoveCreator moveCreator;
 
-public class BotSimulatedAnnealing extends Bot {
+  public Bot(boolean isFirst, MoveCreator moveCreator) {
+    if (isFirst) {
+      me = "X";
+      enemy = "O";
+    } else {
+      enemy = "X";
+      me = "O";
+    }
 
-  @Override
+    this.moveCreator = moveCreator;
+  }
   public int[] move(Button[][] b, int rl, boolean isBotFirst) {
     String[][] board = Board.getBoard(b);
-    List<int[]> emptySpaces = Board.getEmptySpaces(board);
+    int emptySpaceSize = Board.getEmptySpaces(board).size();
+    int depth = depthGame(rl, isBotFirst, emptySpaceSize);
 
-    int depth_game = depthGame(rl, isBotFirst, emptySpaces.size());
-
-    SimulatedAnnealing simAnnealing = new SimulatedAnnealing();
-    int[] res = simAnnealing.simAnnealing(board, depth_game);
-
-    return new int[] { res[0], res[1] };
+    return moveCreator.makeMove(this, board, depth);
   }
 
-  // return dept of the game
   private int depthGame(int rl, boolean isBotFirst, int sizeEmptySpaces) {
     // one round is player move and bot move
     // if bot is first, then the depth of the game will 2 * rl

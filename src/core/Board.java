@@ -3,7 +3,6 @@ package core;
 import java.util.ArrayList;
 import java.util.List;
 
-import core.bot.BotMinimax;
 import javafx.scene.control.Button;
 import javafx.util.Pair;
 
@@ -108,8 +107,8 @@ public class Board {
   }
 
   // move function, return the board and board value
-  public static Pair<String[][], Integer> updateGameBoard(String[][] board, String player, int boardValue, int i,
-      int j) {
+  public static Pair<String[][], Integer> updateGameBoard(Bot bot, String[][] board, String player, int boardValue, int i,
+                                                          int j) {
     // Value of indices to control the lower/upper bound of rows and columns
     // in order to change surrounding/adjacent X's and O's only on the game board.
     // Four boundaries: First & last row and first & last column.
@@ -143,20 +142,20 @@ public class Board {
 
     Pair<String[][], Integer> p = new Pair<>(newBoard1, boardValue);
     for (int x = startRow; x <= endRow; x++) {
-      p = setBoard(p, player, x, j);
+      p = setBoard(bot, p, player, x, j);
     }
     for (int y = startColumn; y <= endColumn; y++) {
-      p = setBoard(p, player, i, y);
+      p = setBoard(bot, p, player, i, y);
     }
 
     String[][] newBoard = p.getKey();
     int delta = p.getValue();
     // for center
-    if (player.equals(bot)) {
-      newBoard[i][j] = bot;
+    if (player.equals(bot.me)) {
+      newBoard[i][j] = bot.me;
       delta++;
     } else {
-      newBoard[i][j] = BotMinimax.player;
+      newBoard[i][j] = bot.enemy;
       delta--;
     }
     p = new Pair<>(newBoard, delta);
@@ -164,17 +163,17 @@ public class Board {
   }
 
   // set board
-  private static Pair<String[][], Integer> setBoard(Pair<String[][], Integer> p, String player, int i, int j) {
+  private static Pair<String[][], Integer> setBoard(Bot bot, Pair<String[][], Integer> p, String player, int i, int j) {
     int delta = p.getValue();
     String[][] board = p.getKey();
-    if (player.equals(BotMinimax.player)) {
-      if (board[i][j].equals(BotMinimax.bot)) {
-        board[i][j] = BotMinimax.player;
+    if (player.equals(bot.enemy)) {
+      if (board[i][j].equals(bot.me)) {
+        board[i][j] = bot.enemy;
         // x++, o--
         delta -= 2;
       }
-    } else if (board[i][j].equals(BotMinimax.player)) {
-      board[i][j] = BotMinimax.bot;
+    } else if (board[i][j].equals(bot.enemy)) {
+      board[i][j] = bot.me;
       // x--, o++
       delta += 2;
     }
