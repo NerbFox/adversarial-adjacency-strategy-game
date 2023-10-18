@@ -1,7 +1,11 @@
+package core.algorithms;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import core.Board;
+import core.bot.BotMinimax;
 
 public class MinimaxAlgorithm {
     private final int alpha = Integer.MIN_VALUE; // -infinity
@@ -19,7 +23,7 @@ public class MinimaxAlgorithm {
     private int[] minimaxDecision(String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta,
                                   boolean isMaximizing) {
         if (depth == 0) {
-            bvalue = Bot.boardValue(board);
+            bvalue = Board.boardValue(board);
             return new int[] { bvalue, -1, -1, alpha, beta };
         }
         int bestValue;
@@ -31,7 +35,7 @@ public class MinimaxAlgorithm {
             for (int[] space : emptySpaces) {
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = Bot.updateGameBoard(board, Bot.bot, bvalue, i, j);
+                Pair<String[][], Integer> p = Board.updateGameBoard(board, BotMinimax.bot, bvalue, i, j);
                 List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces;
                 newEmptySpaces.remove(0);
 
@@ -53,7 +57,7 @@ public class MinimaxAlgorithm {
             for (int[] space : emptySpaces) {
                 int i = space[0];
                 int j = space[1];
-                Pair<String[][], Integer> p = Bot.updateGameBoard(board, Bot.player, bvalue, i, j);
+                Pair<String[][], Integer> p = Board.updateGameBoard(board, BotMinimax.player, bvalue, i, j);
                 List<int[]> newEmptySpaces = new ArrayList<>(emptySpaces); // copy of emptySpaces
                 newEmptySpaces.remove(0);
 

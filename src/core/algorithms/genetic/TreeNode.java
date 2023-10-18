@@ -1,3 +1,4 @@
+package core.algorithms.genetic;
 
 import java.util.HashMap;
 import java.util.Map;

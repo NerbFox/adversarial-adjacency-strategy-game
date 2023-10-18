@@ -1,7 +1,11 @@
+package core.algorithms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import core.algorithms.genetic.Chromosome;
+import core.algorithms.genetic.ReservationTree;
 
 public class GeneticAlgorithm {
     public int[] GeneticAlgo(String[][] board, List<int[]> emptySpaces) {
