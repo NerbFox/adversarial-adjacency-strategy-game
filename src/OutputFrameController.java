@@ -380,7 +380,7 @@ public class OutputFrameController {
     public void nextTurn() {
         if (this.playerXTurn) {
             if (this.botPlayer1 == null) {
-                new Alert(Alert.AlertType.ERROR, "Yang dipilih panenya tolol").showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Yang dipilih panenya dong sayangggg").showAndWait();
             } else {
                 this.moveBotX();
             }

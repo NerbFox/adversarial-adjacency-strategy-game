@@ -38,14 +38,8 @@ public class Board {
   }
 
   // Function to get empty spaces
-  public static List<int[]> getEmptySpaces(String[][] board) {
-    // return getEmptySpacesNormal(board);
-    // yg heuristic cuma untuk minimax
-    return getEmptySpacesHeuristic(board);
-  }
-
   // get empty spaces that return list of tuples int (all empty spaces)
-  private static List<int[]> getEmptySpacesNormal(String[][] board) {
+  public static List<int[]> getEmptySpaces(String[][] board) {
     List<int[]> emptySpaces = new ArrayList<int[]>();
     for (int i = 0; i < ROW; i++) {
       for (int j = 0; j < COL; j++) {
@@ -59,7 +53,7 @@ public class Board {
 
   // Heuristic function for empty spaces (empty spaces that have a piece on the
   // left, right, up, or down)
-  private static List<int[]> getEmptySpacesHeuristic(String[][] board) {
+  public static List<int[]> getEmptySpacesHeuristic(String[][] board) {
     List<int[]> emptySpaces = new ArrayList<>();
     boolean moreSpace = true;
     for (int i = 0; i < ROW; i++) {

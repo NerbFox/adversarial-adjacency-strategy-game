@@ -45,6 +45,7 @@ public class Bot  {
     if (sizeEmptySpaces < depth_game) {
       depth_game = sizeEmptySpaces;
     }
+
     return depth_game;
   }
 }
