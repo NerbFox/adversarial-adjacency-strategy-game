@@ -34,8 +34,8 @@ public class MinimaxAlgorithm implements MoveCreator {
             return new int[] { bvalue, -1, -1, alpha, beta };
         }
         int bestValue;
-        int bestX = emptySpaces.get(0)[0];
-        int bestY = emptySpaces.get(0)[1];
+        int bestX = -1;
+        int bestY = -1;
 
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
