@@ -80,21 +80,7 @@ public class OutputFrameController {
         this.isBotFirst = isBotFirst;
 
         // tipe player 1
-        if (player1Type.equals("human")) {
-            for (int i = 0; i < ROW; i++) {
-                for (int j = 0; j < COL; j++) {
-                    // Add ActionListener to each button such that when it is clicked, calls
-                    // the selected coordinates method with its i and j coordinates.
-                    final int finalI = i;
-                    final int finalJ = j;
-                    this.buttons[i][j].setOnAction((event) -> {
-                        if (playerXTurn) {
-                            this.selectedCoordinates(finalI, finalJ);
-                        }
-                    });
-                }
-            }
-        } else if (player1Type.equals("minimax")) {
+        if (player1Type.equals("minimax")) {
             this.botPlayer1 = new Bot(true, new MinimaxAlgorithm());
         } else if (player1Type.equals("genetic algorithm")) {
             this.botPlayer1 = new Bot(true, new GeneticAlgorithm());
@@ -107,7 +93,21 @@ public class OutputFrameController {
         }
 
         // tipe player 2
-        if (player2Type.equals("minimax")) {
+        if (player2Type.equals("human")) {
+//            for (int i = 0; i < ROW; i++) {
+//                for (int j = 0; j < COL; j++) {
+//                    // Add ActionListener to each button such that when it is clicked, calls
+//                    // the selected coordinates method with its i and j coordinates.
+//                    final int finalI = i;
+//                    final int finalJ = j;
+//                    this.buttons[i][j].setOnAction((event) -> {
+//                        if (!playerXTurn) {
+//                            this.selectedCoordinates(finalI, finalJ);
+//                        }
+//                    });
+//                }
+//            }
+        } else if (player2Type.equals("minimax")) {
             this.botPlayer2 = new Bot(false, new MinimaxAlgorithm());
         } else if (player2Type.equals("genetic algorithm")) {
             this.botPlayer2 = new Bot(false, new GeneticAlgorithm());
@@ -118,6 +118,29 @@ public class OutputFrameController {
         } else if (player2Type.equals("steepest hill climbing")) {
             this.botPlayer2 = new Bot(false, new SteepestHillClimbing());
         }
+
+        for (int i = 0; i < ROW; i++) {
+            for (int j = 0; j < COL; j++) {
+                // Add ActionListener to each button such that when it is clicked, calls
+                // the selected coordinates method with its i and j coordinates.
+                final int finalI = i;
+                final int finalJ = j;
+                this.buttons[i][j].setOnAction((event) -> {
+                    if (player1Type.equals("human") && player2Type.equals("human")) {
+                        this.selectedCoordinates(finalI, finalJ);
+                    } else if (player1Type.equals("human")) {
+                        if (playerXTurn) {
+                            this.selectedCoordinates(finalI, finalJ);
+                        }
+                    } else if (player2Type.equals("human")) {
+                        if (!playerXTurn) {
+                            this.selectedCoordinates(finalI, finalJ);
+                        }
+                    }
+                });
+            }
+        }
+
         this.playerXTurn = !isBotFirst;
 
     }
@@ -385,17 +408,22 @@ public class OutputFrameController {
                 this.moveBotX();
             }
         } else {
-            this.moveBotO();
+            if (this.botPlayer2 == null) {
+                new Alert(Alert.AlertType.ERROR, "Yang dipilih panenya dong sayangggg").showAndWait();
+            } else {
+                this.moveBotO();
+            }
         }
     }
 
     private void moveBotX() {
         // Get bot's move. Pass the current game board, the number of rounds left, and
         // the first turn.
+        System.out.println("Bool now XX: " + this.isBotFirst);
         int[] botMove = this.botPlayer1.move(this.buttons, this.roundsLeft, this.isBotFirst);
         int i = botMove[0];
         int j = botMove[1];
-
+        System.out.println(i + " " + j);
         if (!this.buttons[i][j].getText().equals("")) {
             new Alert(Alert.AlertType.ERROR, "Bot Invalid Coordinates. Exiting.").showAndWait();
             System.exit(1);
@@ -408,7 +436,8 @@ public class OutputFrameController {
     private void moveBotO() {
         // Get bot's move. Pass the current game board, the number of rounds left, and
         // the first turn.
-        int[] botMove = this.botPlayer2.move(this.buttons, this.roundsLeft, this.isBotFirst);
+        System.out.println("Bool now OO: " + !this.isBotFirst);
+        int[] botMove = this.botPlayer2.move(this.buttons, this.roundsLeft, !this.isBotFirst);
         int i = botMove[0];
         int j = botMove[1];
 

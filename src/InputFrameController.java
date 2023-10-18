@@ -54,7 +54,7 @@ public class InputFrameController {
                 "steepest hill climbing");
 
         ObservableList<String> player2TypeDropdown = FXCollections.observableArrayList(
-                "", "minimax", "genetic algorithm", "simulated annealing", "stochastic hill climbing", "steepest hill climbing");
+                "", "human", "minimax", "genetic algorithm", "simulated annealing", "stochastic hill climbing", "steepest hill climbing");
 
         this.numberOfRounds.setItems(numberOfRoundsDropdown);
         this.numberOfRounds.getSelectionModel().select(0);

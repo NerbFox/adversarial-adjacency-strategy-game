@@ -13,7 +13,7 @@ public class SteepestHillClimbing implements MoveCreator {
 
     // Initialize current successor with the first empty space coordinates
     int[] currentCoord = emptySpaces.get(0);
-    int bValue = Board.boardValue(board);
+    int bValue = Board.boardValue(bot, board);
 
     // Search loop
     for (int[] nextCoord : emptySpaces) {

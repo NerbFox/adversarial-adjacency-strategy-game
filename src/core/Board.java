@@ -94,15 +94,16 @@ public class Board {
       }
     }
     // print empty spaces
-    for (int[] emptySpace : emptySpaces) {
-      System.out.println("empty space: " + emptySpace[0] + " " + emptySpace[1]);
-    }
+//    for (int[] emptySpace : emptySpaces) {
+//      System.out.println("empty space: " + emptySpace[0] + " " + emptySpace[1]);
+//    }
     return emptySpaces;
   }
 
   // move function, return the board and board value
-  public static Pair<String[][], Integer> updateGameBoard(Bot bot, String[][] board, String player, int boardValue, int i,
-                                                          int j) {
+  public static Pair<String[][], Integer> updateGameBoard(Bot bot, String[][] board, String player, int boardValue,
+      int i,
+      int j) {
     // Value of indices to control the lower/upper bound of rows and columns
     // in order to change surrounding/adjacent X's and O's only on the game board.
     // Four boundaries: First & last row and first & last column.
@@ -177,13 +178,13 @@ public class Board {
   // the objective function is the sum of the values of each row, column, and
   // diagonal
   // where O is +1 and X is -1, value = sumOfO - sumOfX
-  public static int boardValue(String[][] board) {
+  public static int boardValue(Bot bot, String[][] board) {
     int value = 0;
     for (int i = 0; i < ROW; i++) {
       for (int j = 0; j < COL; j++) {
-        if (board[i][j].equals("O")) {
+        if (board[i][j].equals(bot.me)) {
           value++;
-        } else if (board[i][j].equals("X")) {
+        } else if (board[i][j].equals(bot.enemy)) {
           value--;
         }
       }

@@ -54,7 +54,7 @@ public class ReservationTree {
   private void updateTreeNode(Bot bot, Chromosome chromosome, String[][] board) {
     List<int[]> sequence = chromosome.getSequence();
 
-    Pair<String[][], Integer> boardVal = new Pair<>(board, Board.boardValue(board));
+    Pair<String[][], Integer> boardVal = new Pair<>(board, Board.boardValue(bot, board));
     TreeNode currNode = this.root;
     boolean isBot = true;
 

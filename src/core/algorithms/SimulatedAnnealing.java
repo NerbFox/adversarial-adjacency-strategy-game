@@ -19,7 +19,7 @@ public class SimulatedAnnealing implements MoveCreator {
     // Initialize current successor randomly
     Random rand = new Random();
     int[] currentCoord = emptySpaces.get(rand.nextInt(emptySpaces.size()));
-    int bValue = Board.boardValue(board);
+    int bValue = Board.boardValue(bot, board);
     double T = depth;
     while (true) {
       T = schedule(T);

@@ -14,11 +14,19 @@ public class MinimaxAlgorithm implements MoveCreator {
     // minimax algorithm with alpha-beta pruning
     public int[] makeMove(Bot bot, String[][] board, int depth) {
         List<int[]> emptySpace = Board.getEmptySpacesHeuristic(board);
-        if (emptySpace.size() > 9){
-            depth = 6;
+        System.out.println(emptySpace.size() + " empty space size");
+        System.out.println(depth + " = depth");
+        if (depth > 6){
+            if (bot.me.equals("X")) { // First player
+                depth = 6;
+            } else { // Second player
+                depth = 5;
+            }
         }
+        System.out.println(emptySpace.size() + " after empty space size");
+        System.out.println(depth + " = after depth");
 
-        int boardValue = Board.boardValue(board);
+        int boardValue = Board.boardValue(bot, board);
 
         System.out.println("alpha: " + alpha + " beta: " + beta);
         int[] res = this.minimaxDecision(bot, board, emptySpace, boardValue, depth, alpha, beta, true);
@@ -30,7 +38,7 @@ public class MinimaxAlgorithm implements MoveCreator {
     private int[] minimaxDecision(Bot bot, String[][] board, List<int[]> emptySpaces, int bvalue, int depth, int alpha, int beta,
                                   boolean isMaximizing) {
         if (depth == 0) {
-            bvalue = Board.boardValue(board);
+            bvalue = Board.boardValue(bot, board);
             return new int[] { bvalue, -1, -1, alpha, beta };
         }
         int bestValue;
